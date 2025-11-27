@@ -1,0 +1,6277 @@
+{
+  "collection": {
+    "item": [
+      {
+        "id": "166b2de2-5753-44b2-8dd6-28afa5aea48e",
+        "name": "Setup - Register & Login",
+        "item": [
+          {
+            "id": "16f16b43-7457-41b7-a632-e4e76bb83a64",
+            "name": "Register New User",
+            "request": {
+              "url": {
+                "path": [
+                  "register"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"email\": \"{{unique_email}}\", \"password\": \"{{test_password}}\"}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "prerequest",
+                "script": {
+                  "id": "511978fa-f7b3-43d2-8881-09d353286583",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.environment.set('unique_email', 'qatest_' + Date.now() + '@example.com');"
+                  ],
+                  "_lastExecutionId": "48e0d25e-a8e5-4b44-8561-fd33cb3af8c3"
+                }
+              },
+              {
+                "listen": "test",
+                "script": {
+                  "id": "eb6c795d-5701-47e2-afd9-85f690efdf47",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Status code must be 201 Created', function () {",
+                    "    pm.response.to.have.status(201);",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Response contains required fields', function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('message');",
+                    "    pm.expect(jsonData.message).to.be.a('string');",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Message includes registered keyword', function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData.message.toLowerCase()).to.include('registered');",
+                    "});",
+                    "",
+                    "pm.test('[DATA] Email stored correctly', function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(pm.environment.get('unique_email')).to.be.a('string');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "f24d7ceb-16b2-4935-831a-d9fe04df8a7e"
+                }
+              }
+            ]
+          },
+          {
+            "id": "8c63fdd6-42e2-422c-abd8-41280f7a7ea7",
+            "name": "Register - Missing Email (Negative)",
+            "request": {
+              "url": {
+                "path": [
+                  "register"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"password\": \"{{test_password}}\"}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "6031c9b4-5752-4806-af04-5cb3668f9cf9",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[VALIDATION] Missing email test executed', function () {",
+                    "    var response = pm.response.json();",
+                    "    pm.expect(response).to.be.an('object');",
+                    "});",
+                    "",
+                    "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                    "    pm.response.to.have.status(409);",
+                    "});",
+                    "",
+                    "pm.test('[VALIDATION] API rejects missing required email field', function () {",
+                    "    var response = pm.response.json();",
+                    "    pm.expect(response).to.be.an('object');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "612d9f88-91c5-4176-9edb-20f9ef20bae4"
+                }
+              }
+            ]
+          },
+          {
+            "id": "f456bfef-1925-4a32-acb7-59156975ee27",
+            "name": "Register - Missing Password (Negative)",
+            "request": {
+              "url": {
+                "path": [
+                  "register"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"email\": \"test@example.com\"}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "64aeb694-1017-4db3-bd5b-74aeb0da3eff",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[VALIDATION] Missing password test executed', function () {",
+                    "    var response = pm.response.json();",
+                    "    pm.expect(response).to.be.an('object');",
+                    "});",
+                    "",
+                    "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                    "    pm.response.to.have.status(409);",
+                    "});",
+                    "",
+                    "pm.test('[VALIDATION] API rejects missing required password field', function () {",
+                    "    var response = pm.response.json();",
+                    "    pm.expect(response).to.be.an('object');",
+                    "});"
+                  ],
+                  "_lastExecutionId": "4f682985-b896-4fd3-a377-4ff58cde96e2"
+                }
+              }
+            ]
+          },
+          {
+            "id": "2fc64c53-a56d-463c-876e-d32ba423a7fc",
+            "name": "Login Successfully",
+            "request": {
+              "url": {
+                "path": [
+                  "login"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"email\": \"{{unique_email}}\", \"password\": \"{{test_password}}\"}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "00943ddc-9ef9-42b6-82ea-f9e3d5d88a39",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Status code is 200', function () {",
+                    "    pm.response.to.have.status(200);",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Response has JWT token field', function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData).to.have.property('token');",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Token is non-empty string', function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.expect(jsonData.token).to.be.a('string');",
+                    "    pm.expect(jsonData.token.length).to.be.greaterThan(0);",
+                    "});",
+                    "",
+                    "pm.test('[FORMAT] Token is valid JWT format', function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    var jwtRegex = /^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$/;",
+                    "    pm.expect(jwtRegex.test(jsonData.token)).to.be.true;",
+                    "});",
+                    "",
+                    "pm.test('[STATE] Token stored in environment', function () {",
+                    "    var jsonData = pm.response.json();",
+                    "    pm.environment.set('auth_token', jsonData.token);",
+                    "    pm.expect(pm.environment.get('auth_token')).to.equal(jsonData.token);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "b9c61876-ccbe-43f9-8a3c-cf8bb25f87f6"
+                }
+              }
+            ]
+          },
+          {
+            "id": "dcab9280-9a85-4cfe-88c1-4711cbeef30a",
+            "name": "Login - Invalid Credentials (Negative)",
+            "request": {
+              "url": {
+                "path": [
+                  "login"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"email\": \"nonexistent@example.com\", \"password\": \"WrongPassword\"}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "dbbad2cd-9a29-4c81-b019-5c7f09317c06",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[AUTH] Should reject invalid credentials with 401', function () {",
+                    "    pm.response.to.have.status(401);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "d3384c7e-252b-4030-9734-761bbbf437a9"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "2a7f3f6c-7e1e-42f6-8710-f0bbdb9ef870",
+        "name": "Products Endpoint",
+        "item": [
+          {
+            "id": "d9d573dd-e802-4913-8407-4778fcfb44d8",
+            "name": "Get All Products",
+            "request": {
+              "url": {
+                "path": [
+                  "products"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "0c074117-c273-4d0b-9bbe-7c99e7e17023",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                    "",
+                    "pm.test('[SCHEMA] Response is array', function () {",
+                    "    pm.expect(Array.isArray(pm.response.json())).to.be.true;",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Array is not empty', function () {",
+                    "    pm.expect(pm.response.json().length).to.be.greaterThan(0);",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Each product has required fields', function () {",
+                    "    var products = pm.response.json();",
+                    "    products.forEach(function(p) {",
+                    "        pm.expect(p).to.have.property('id');",
+                    "        pm.expect(p).to.have.property('name');",
+                    "        pm.expect(p).to.have.property('price');",
+                    "        pm.expect(p).to.have.property('stock');",
+                    "    });",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Field types are correct', function () {",
+                    "    var products = pm.response.json();",
+                    "    products.forEach(function(p) {",
+                    "        pm.expect(p.id).to.be.a('number');",
+                    "        pm.expect(p.name).to.be.a('string');",
+                    "        pm.expect(p.price).to.be.a('number');",
+                    "        pm.expect(p.stock).to.be.a('number');",
+                    "    });",
+                    "});",
+                    "",
+                    "pm.test('[VALIDATION] Price is non-negative', function () {",
+                    "    var products = pm.response.json();",
+                    "    products.forEach(function(p) {",
+                    "        pm.expect(p.price).to.be.at.least(0);",
+                    "    });",
+                    "});",
+                    "",
+                    "pm.test('[BUG] Stock should not be negative', function () {",
+                    "    var products = pm.response.json();",
+                    "    var negatives = products.filter(p => p.stock < 0);",
+                    "    if (negatives.length > 0) {",
+                    "        console.warn('BUG FOUND: Products with negative stock:', negatives);",
+                    "    }",
+                    "});"
+                  ],
+                  "_lastExecutionId": "f575bec2-a3ec-47e2-a05f-7dbf632721e0"
+                }
+              }
+            ]
+          },
+          {
+            "id": "62dc8374-dccb-4bcf-be8a-cb5e42d787bb",
+            "name": "Get Product by ID",
+            "request": {
+              "url": {
+                "path": [
+                  "products",
+                  "1"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "c801254b-3562-4ccf-bb48-808bc3aab6f4",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                    "",
+                    "pm.test('[SCHEMA] Response is object', function () {",
+                    "    pm.expect(pm.response.json()).to.be.an('object');",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Has base product fields', function () {",
+                    "    var p = pm.response.json();",
+                    "    pm.expect(p).to.have.property('id');",
+                    "    pm.expect(p).to.have.property('name');",
+                    "    pm.expect(p).to.have.property('price');",
+                    "    pm.expect(p).to.have.property('stock');",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Field types correct', function () {",
+                    "    var p = pm.response.json();",
+                    "    pm.expect(p.id).to.be.a('number');",
+                    "    pm.expect(p.name).to.be.a('string');",
+                    "    pm.expect(p.price).to.be.a('number');",
+                    "    pm.expect(p.stock).to.be.a('number');",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Detailed product has description', function () {",
+                    "    var p = pm.response.json();",
+                    "    if (p.isDetailed === true) {",
+                    "        pm.expect(p).to.have.property('description');",
+                    "        pm.expect(p.description).to.be.a('string');",
+                    "    }",
+                    "});",
+                    "",
+                    "pm.test('[DATA] Product ID matches request', function () {",
+                    "    var p = pm.response.json();",
+                    "    pm.expect(p.id).to.equal(1);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "c6464d1c-600a-44fb-bc9d-d0523be56512"
+                }
+              }
+            ]
+          },
+          {
+            "id": "869b8931-f4be-42b9-bb72-81e80ba3df4a",
+            "name": "Search Product by Name (Exact Match)",
+            "request": {
+              "url": {
+                "path": [
+                  "products"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [
+                  {
+                    "key": "name",
+                    "value": "Laptop"
+                  }
+                ],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "568250f9-847e-4ce1-b976-67ac2b6dde8d",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                    "",
+                    "pm.test('[SCHEMA] Response is array', function () {",
+                    "    pm.expect(Array.isArray(pm.response.json())).to.be.true;",
+                    "});",
+                    "",
+                    "pm.test('[SEARCH] Returns matching products', function () {",
+                    "    var results = pm.response.json();",
+                    "    pm.expect(results.length).to.be.greaterThan(0);",
+                    "});",
+                    "",
+                    "pm.test('[CASE-SENSITIVE] Search is case-sensitive', function () {",
+                    "    var results = pm.response.json();",
+                    "    results.forEach(p => pm.expect(p.name).to.equal('Laptop'));",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Results have required fields', function () {",
+                    "    var results = pm.response.json();",
+                    "    results.forEach(p => {",
+                    "        pm.expect(p).to.have.property('id');",
+                    "        pm.expect(p).to.have.property('name');",
+                    "        pm.expect(p).to.have.property('price');",
+                    "        pm.expect(p).to.have.property('stock');",
+                    "    });",
+                    "});"
+                  ],
+                  "_lastExecutionId": "9fe75aff-0126-4643-a2e9-3a4ab8721567"
+                }
+              }
+            ]
+          },
+          {
+            "id": "7ed2f672-c9c5-462a-a0d3-26295e1976b9",
+            "name": "Search - Case Mismatch (Negative)",
+            "request": {
+              "url": {
+                "path": [
+                  "products"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [
+                  {
+                    "key": "name",
+                    "value": "laptop"
+                  }
+                ],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "b4ffc3cb-4fa0-40ef-bf42-baa6edc7a135",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[CASE-SENSITIVE] Lowercase search returns empty', function () {",
+                    "    var results = pm.response.json();",
+                    "    pm.expect(results).to.be.an('array');",
+                    "    pm.expect(results.length).to.equal(0);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "87fc1166-f253-4670-9894-c425b22b61af"
+                }
+              }
+            ]
+          },
+          {
+            "id": "1ee2cc0d-4684-4051-87ad-790a693f93c6",
+            "name": "Get Non-existent Product (Negative)",
+            "request": {
+              "url": {
+                "path": [
+                  "products",
+                  "99999"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "3673b407-b09c-4b1d-bfee-3a52d5c37c2b",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Returns 404 for non-existent ID', function () {",
+                    "    pm.response.to.have.status(404);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "c1c6473c-475a-45fa-a548-94c9bf56a073"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      },
+      {
+        "id": "815a412a-9791-4c06-a787-8183cf0a241e",
+        "name": "Orders Endpoint",
+        "item": [
+          {
+            "id": "1a8e965b-60d9-41bb-ab78-b55b85e2879f",
+            "name": "Create Order (Authenticated)",
+            "request": {
+              "url": {
+                "path": [
+                  "orders"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"products\": [1, 2]}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "7f3642f5-0368-4a29-a57a-600551dddd41",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                    "",
+                    "pm.test('[SCHEMA] Response has required fields', function () {",
+                    "    var order = pm.response.json();",
+                    "    pm.expect(order).to.have.property('id');",
+                    "    pm.expect(order).to.have.property('user');",
+                    "    pm.expect(order).to.have.property('products');",
+                    "    pm.expect(order).to.have.property('total');",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Field types are correct', function () {",
+                    "    var order = pm.response.json();",
+                    "    pm.expect(order.id).to.be.a('string');",
+                    "    pm.expect(order.user).to.be.a('string');",
+                    "    pm.expect(Array.isArray(order.products)).to.be.true;",
+                    "    pm.expect(order.total).to.be.a('number');",
+                    "});",
+                    "",
+                    "pm.test('[VALIDATION] Total is positive', function () {",
+                    "    var order = pm.response.json();",
+                    "    pm.expect(order.total).to.be.greaterThan(0);",
+                    "});",
+                    "",
+                    "pm.test('[VALIDATION] Order ID is non-empty', function () {",
+                    "    var order = pm.response.json();",
+                    "    pm.expect(order.id.length).to.be.greaterThan(0);",
+                    "});",
+                    "",
+                    "pm.test('[BUSINESS] User matches authenticated user', function () {",
+                    "    var order = pm.response.json();",
+                    "    pm.expect(order.user).to.equal(pm.environment.get('unique_email'));",
+                    "});",
+                    "",
+                    "pm.test('[STATE] Store order ID for later use', function () {",
+                    "    var order = pm.response.json();",
+                    "    pm.environment.set('order_id', order.id);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "b34f4193-c052-414c-9924-2723ec4ff7c7"
+                }
+              }
+            ]
+          },
+          {
+            "id": "bbdadffc-dd1f-41ca-bfcf-e26d02315129",
+            "name": "Create Order - No Auth (Negative)",
+            "request": {
+              "url": {
+                "path": [
+                  "orders"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"products\": [1, 2]}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "b517d732-7bf9-48ef-9fc7-2b58757733b4",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[AUTH] Requires authentication with 401', function () {",
+                    "    pm.response.to.have.status(401);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "7c7ab32f-29c6-4f0b-ae8c-d0d62d0864f4"
+                }
+              }
+            ]
+          },
+          {
+            "id": "6f7997cd-80dd-40df-8995-fac30c6961e0",
+            "name": "Create Order - Invalid Token (Negative)",
+            "request": {
+              "url": {
+                "path": [
+                  "orders"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer invalid.token.here"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "method": "POST",
+              "body": {
+                "mode": "raw",
+                "raw": "{\"products\": [1, 2]}"
+              }
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "688447bd-9adc-4f03-9f30-77cdb7bd2987",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[AUTH] Rejects invalid token with 403', function () {",
+                    "    pm.response.to.have.status(403);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "7b1d02d0-14d8-4bd8-8ac7-c4e399e19509"
+                }
+              }
+            ]
+          },
+          {
+            "id": "6cf21e2c-b0d3-4fe2-8e0c-e99e967e092e",
+            "name": "Get All Orders (Authenticated)",
+            "request": {
+              "url": {
+                "path": [
+                  "orders"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "b98c5542-16ce-4980-a1f4-455cc80b815a",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                    "",
+                    "pm.test('[SCHEMA] Response is array', function () {",
+                    "    pm.expect(Array.isArray(pm.response.json())).to.be.true;",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Array contains orders', function () {",
+                    "    pm.expect(pm.response.json().length).to.be.greaterThan(0);",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Each order has required fields', function () {",
+                    "    var orders = pm.response.json();",
+                    "    orders.forEach(o => {",
+                    "        pm.expect(o).to.have.property('id');",
+                    "        pm.expect(o).to.have.property('user');",
+                    "        pm.expect(o).to.have.property('products');",
+                    "        pm.expect(o).to.have.property('total');",
+                    "    });",
+                    "});",
+                    "",
+                    "pm.test('[BUSINESS] All orders belong to current user', function () {",
+                    "    var orders = pm.response.json();",
+                    "    var userEmail = pm.environment.get('unique_email');",
+                    "    orders.forEach(o => pm.expect(o.user).to.equal(userEmail));",
+                    "});"
+                  ],
+                  "_lastExecutionId": "e2f169cc-319c-4163-a7e4-fc1eff954eb1"
+                }
+              }
+            ]
+          },
+          {
+            "id": "b32e7840-1818-4d1b-9d31-4d4cb7e22969",
+            "name": "Get All Orders - No Auth (Negative)",
+            "request": {
+              "url": {
+                "path": [
+                  "orders"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "07d1c238-87c8-4c31-99f3-233d4d5f14b3",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[AUTH] Requires authentication with 401', function () {",
+                    "    pm.response.to.have.status(401);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "d95387d8-f67c-4819-9123-f47db18bffac"
+                }
+              }
+            ]
+          },
+          {
+            "id": "573ea27c-ddca-4d00-a4b0-a75d6a676a81",
+            "name": "Get Order by ID",
+            "request": {
+              "url": {
+                "path": [
+                  "orders",
+                  "{{order_id}}"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "da8d2026-e2f6-4bb4-9271-52f6dfaa94c9",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                    "",
+                    "pm.test('[SCHEMA] Response is object', function () {",
+                    "    pm.expect(pm.response.json()).to.be.an('object');",
+                    "});",
+                    "",
+                    "pm.test('[SCHEMA] Has required fields', function () {",
+                    "    var order = pm.response.json();",
+                    "    pm.expect(order).to.have.property('id');",
+                    "    pm.expect(order).to.have.property('user');",
+                    "    pm.expect(order).to.have.property('products');",
+                    "    pm.expect(order).to.have.property('total');",
+                    "});",
+                    "",
+                    "pm.test('[BUSINESS] Order ID matches request', function () {",
+                    "    var order = pm.response.json();",
+                    "    pm.expect(order.id).to.equal(pm.environment.get('order_id'));",
+                    "});",
+                    "",
+                    "pm.test('[BUSINESS] User can only access own orders', function () {",
+                    "    var order = pm.response.json();",
+                    "    pm.expect(order.user).to.equal(pm.environment.get('unique_email'));",
+                    "});"
+                  ],
+                  "_lastExecutionId": "9cbeb414-07f0-45d2-b73f-99b32c30c121"
+                }
+              }
+            ]
+          },
+          {
+            "id": "51ee4e2a-6206-4cb0-93c3-b21bdbced470",
+            "name": "Get Non-existent Order (Negative)",
+            "request": {
+              "url": {
+                "path": [
+                  "orders",
+                  "99999999999"
+                ],
+                "host": [
+                  "{{base_url}}"
+                ],
+                "query": [],
+                "variable": []
+              },
+              "header": [
+                {
+                  "key": "Authorization",
+                  "value": "Bearer {{auth_token}}"
+                }
+              ],
+              "method": "GET"
+            },
+            "response": [],
+            "event": [
+              {
+                "listen": "test",
+                "script": {
+                  "id": "31dbbbbb-6b68-4626-97ef-fe37430f460d",
+                  "type": "text/javascript",
+                  "exec": [
+                    "pm.test('[HTTP] Returns 404 for non-existent order', function () {",
+                    "    pm.response.to.have.status(404);",
+                    "});"
+                  ],
+                  "_lastExecutionId": "b66b5879-ecc2-443c-a8d9-18d8b2fca54c"
+                }
+              }
+            ]
+          }
+        ],
+        "event": []
+      }
+    ],
+    "event": [],
+    "variable": [],
+    "info": {
+      "_postman_id": "75869089-17eb-4abf-827d-d2e1cbeda6cd",
+      "name": "QA API Challenge - Comprehensive Test Suite",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+      "description": {
+        "content": "Advanced test suite with schema validation, edge cases, and comprehensive assertions",
+        "type": "text/plain"
+      }
+    }
+  },
+  "environment": {
+    "_": {
+      "postman_variable_scope": "environment",
+      "postman_exported_at": "2025-11-27T00:00:00.000Z",
+      "postman_exported_using": "Postman/11.0.0"
+    },
+    "id": "qa-api-challenge-env",
+    "name": "QA API Challenge Environment",
+    "values": [
+      {
+        "type": "string",
+        "value": "https://us-central1-nn-api-challenge.cloudfunctions.net/api",
+        "key": "base_url"
+      },
+      {
+        "type": "string",
+        "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InFhdGVzdF8xNzY0Mjc0NTA1OTI2QGV4YW1wbGUuY29tIiwiaWF0IjoxNzY0Mjc0NTA5fQ.gRwfa19LqtnW4xwag0T_uRjiHSWBpnIDKDC-HwnyZls",
+        "key": "auth_token"
+      },
+      {
+        "type": "string",
+        "value": "qa_tester@example.com",
+        "key": "test_email"
+      },
+      {
+        "type": "string",
+        "value": "QATest123!",
+        "key": "test_password"
+      },
+      {
+        "type": "string",
+        "value": "1764274509684458",
+        "key": "order_id"
+      },
+      {
+        "type": "any",
+        "value": "qatest_1764274505926@example.com",
+        "key": "unique_email"
+      }
+    ]
+  },
+  "globals": {
+    "id": "975ef0ca-3cd1-45c4-9b6c-e2ec17374c23",
+    "values": []
+  },
+  "run": {
+    "stats": {
+      "iterations": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      },
+      "items": {
+        "total": 17,
+        "pending": 0,
+        "failed": 0
+      },
+      "scripts": {
+        "total": 18,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequests": {
+        "total": 17,
+        "pending": 0,
+        "failed": 0
+      },
+      "requests": {
+        "total": 17,
+        "pending": 0,
+        "failed": 0
+      },
+      "tests": {
+        "total": 17,
+        "pending": 0,
+        "failed": 0
+      },
+      "assertions": {
+        "total": 57,
+        "pending": 0,
+        "failed": 2
+      },
+      "testScripts": {
+        "total": 17,
+        "pending": 0,
+        "failed": 0
+      },
+      "prerequestScripts": {
+        "total": 1,
+        "pending": 0,
+        "failed": 0
+      }
+    },
+    "timings": {
+      "responseAverage": 232.7058823529412,
+      "responseMin": 57,
+      "responseMax": 2986,
+      "responseSd": 688.329586300896,
+      "dnsAverage": 0,
+      "dnsMin": 0,
+      "dnsMax": 0,
+      "dnsSd": 0,
+      "firstByteAverage": 0,
+      "firstByteMin": 0,
+      "firstByteMax": 0,
+      "firstByteSd": 0,
+      "started": 1764274505912,
+      "completed": 1764274510157
+    },
+    "executions": [
+      {
+        "cursor": {
+          "position": 0,
+          "iteration": 0,
+          "length": 17,
+          "cycles": 1,
+          "empty": false,
+          "eof": false,
+          "bof": true,
+          "cr": false,
+          "ref": "b3b748d6-748e-42e5-a029-ef2cfefddd9d",
+          "httpRequestId": "276b1681-e8fe-4091-9c6d-4daef8c7107f"
+        },
+        "item": {
+          "id": "16f16b43-7457-41b7-a632-e4e76bb83a64",
+          "name": "Register New User",
+          "request": {
+            "url": {
+              "path": [
+                "register"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"{{unique_email}}\", \"password\": \"{{test_password}}\"}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "id": "511978fa-f7b3-43d2-8881-09d353286583",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('unique_email', 'qatest_' + Date.now() + '@example.com');"
+                ],
+                "_lastExecutionId": "48e0d25e-a8e5-4b44-8561-fd33cb3af8c3"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "id": "eb6c795d-5701-47e2-afd9-85f690efdf47",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Status code must be 201 Created', function () {",
+                  "    pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Response contains required fields', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('message');",
+                  "    pm.expect(jsonData.message).to.be.a('string');",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Message includes registered keyword', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.message.toLowerCase()).to.include('registered');",
+                  "});",
+                  "",
+                  "pm.test('[DATA] Email stored correctly', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(pm.environment.get('unique_email')).to.be.a('string');",
+                  "});"
+                ],
+                "_lastExecutionId": "f24d7ceb-16b2-4935-831a-d9fe04df8a7e"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "register"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "e1756b40-4a30-4085-89f6-ebbaf316bb85",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "71",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\"email\": \"qatest_1764274505926@example.com\", \"password\": \"QATest123!\"}"
+          }
+        },
+        "response": {
+          "id": "1e342383-d4c5-4ba9-91dc-88c7cc1c3cb3",
+          "status": "Created",
+          "code": 201,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"1d-z8tsqeHKSxMH3B4Vf5lYTN+xWss\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "ffa286863426d454f2a9a6ea2cf1e6ca;o=1"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:08 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "29"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              85,
+              115,
+              101,
+              114,
+              32,
+              114,
+              101,
+              103,
+              105,
+              115,
+              116,
+              101,
+              114,
+              101,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 2986,
+          "responseSize": 29
+        },
+        "id": "16f16b43-7457-41b7-a632-e4e76bb83a64",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Status code must be 201 Created",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Response contains required fields",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Message includes registered keyword",
+            "skipped": false
+          },
+          {
+            "assertion": "[DATA] Email stored correctly",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "a6b7f350-f268-4f34-85f4-0775f3091ff5",
+          "length": 17,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "649ec277-2b03-4ecd-a7d5-e4321cc721a4"
+        },
+        "item": {
+          "id": "8c63fdd6-42e2-422c-abd8-41280f7a7ea7",
+          "name": "Register - Missing Email (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "register"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"password\": \"{{test_password}}\"}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "6031c9b4-5752-4806-af04-5cb3668f9cf9",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[VALIDATION] Missing email test executed', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('[VALIDATION] API rejects missing required email field', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('object');",
+                  "});"
+                ],
+                "_lastExecutionId": "612d9f88-91c5-4176-9edb-20f9ef20bae4"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "register"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "edc94766-63f6-460e-a1c3-b1fe3c1cd281",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "26",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\"password\": \"QATest123!\"}"
+          }
+        },
+        "response": {
+          "id": "b60293a3-dee5-4e50-896a-393595676a51",
+          "status": "Created",
+          "code": 201,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"1d-z8tsqeHKSxMH3B4Vf5lYTN+xWss\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "545480535ad951811b9a8baa80445047"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:08 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "29"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              85,
+              115,
+              101,
+              114,
+              32,
+              114,
+              101,
+              103,
+              105,
+              115,
+              116,
+              101,
+              114,
+              101,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 64,
+          "responseSize": 29
+        },
+        "id": "8c63fdd6-42e2-422c-abd8-41280f7a7ea7",
+        "assertions": [
+          {
+            "assertion": "[VALIDATION] Missing email test executed",
+            "skipped": false
+          },
+          {
+            "assertion": "[HTTP] Status code must be 409 Conflict",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 1,
+              "test": "[HTTP] Status code must be 409 Conflict",
+              "message": "expected response to have status code 409 but got 201",
+              "stack": "AssertionError: expected response to have status code 409 but got 201\n   at Object.eval sandbox-script.js:2:2)"
+            }
+          },
+          {
+            "assertion": "[VALIDATION] API rejects missing required email field",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "9284223d-5395-4f5d-9f0b-af8b3fb8bef3",
+          "length": 17,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "61f4fe32-b6fe-4ee9-8f86-a3faff1a6203"
+        },
+        "item": {
+          "id": "f456bfef-1925-4a32-acb7-59156975ee27",
+          "name": "Register - Missing Password (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "register"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"test@example.com\"}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "64aeb694-1017-4db3-bd5b-74aeb0da3eff",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[VALIDATION] Missing password test executed', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('[VALIDATION] API rejects missing required password field', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('object');",
+                  "});"
+                ],
+                "_lastExecutionId": "4f682985-b896-4fd3-a377-4ff58cde96e2"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "register"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "ed441e58-926c-4958-b0a0-08f4a1024a62",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "29",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\"email\": \"test@example.com\"}"
+          }
+        },
+        "response": {
+          "id": "f8396273-f100-4a8e-b3d1-183e9665c7e7",
+          "status": "Created",
+          "code": 201,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"1d-z8tsqeHKSxMH3B4Vf5lYTN+xWss\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "d4c1c64157874e921b9a8baa80445963"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "29"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              109,
+              101,
+              115,
+              115,
+              97,
+              103,
+              101,
+              34,
+              58,
+              34,
+              85,
+              115,
+              101,
+              114,
+              32,
+              114,
+              101,
+              103,
+              105,
+              115,
+              116,
+              101,
+              114,
+              101,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 61,
+          "responseSize": 29
+        },
+        "id": "f456bfef-1925-4a32-acb7-59156975ee27",
+        "assertions": [
+          {
+            "assertion": "[VALIDATION] Missing password test executed",
+            "skipped": false
+          },
+          {
+            "assertion": "[HTTP] Status code must be 409 Conflict",
+            "skipped": false,
+            "error": {
+              "name": "AssertionError",
+              "index": 1,
+              "test": "[HTTP] Status code must be 409 Conflict",
+              "message": "expected response to have status code 409 but got 201",
+              "stack": "AssertionError: expected response to have status code 409 but got 201\n   at Object.eval sandbox-script.js:2:3)"
+            }
+          },
+          {
+            "assertion": "[VALIDATION] API rejects missing required password field",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "29a60278-262f-48bc-824f-093c94b2839b",
+          "length": 17,
+          "cycles": 1,
+          "position": 3,
+          "iteration": 0,
+          "httpRequestId": "f9fc0636-350e-4e53-b9e5-4321f2a63a87"
+        },
+        "item": {
+          "id": "2fc64c53-a56d-463c-876e-d32ba423a7fc",
+          "name": "Login Successfully",
+          "request": {
+            "url": {
+              "path": [
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"{{unique_email}}\", \"password\": \"{{test_password}}\"}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "00943ddc-9ef9-42b6-82ea-f9e3d5d88a39",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Status code is 200', function () {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Response has JWT token field', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData).to.have.property('token');",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Token is non-empty string', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.expect(jsonData.token).to.be.a('string');",
+                  "    pm.expect(jsonData.token.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('[FORMAT] Token is valid JWT format', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    var jwtRegex = /^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$/;",
+                  "    pm.expect(jwtRegex.test(jsonData.token)).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('[STATE] Token stored in environment', function () {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.environment.set('auth_token', jsonData.token);",
+                  "    pm.expect(pm.environment.get('auth_token')).to.equal(jsonData.token);",
+                  "});"
+                ],
+                "_lastExecutionId": "b9c61876-ccbe-43f9-8a3c-cf8bb25f87f6"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "login"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "5bf1c4b0-4568-4992-83d8-f0f2f64bac84",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "71",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\"email\": \"qatest_1764274505926@example.com\", \"password\": \"QATest123!\"}"
+          }
+        },
+        "response": {
+          "id": "28081a64-cbe3-4bce-b002-c89ed81bbd0a",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"af-zOZqhUNZ0WFWSgrg5xDU7V58OAE\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "08acf9fdede9d7db1b9a8baa80445caf"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "175"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              116,
+              111,
+              107,
+              101,
+              110,
+              34,
+              58,
+              34,
+              101,
+              121,
+              74,
+              104,
+              98,
+              71,
+              99,
+              105,
+              79,
+              105,
+              74,
+              73,
+              85,
+              122,
+              73,
+              49,
+              78,
+              105,
+              73,
+              115,
+              73,
+              110,
+              82,
+              53,
+              99,
+              67,
+              73,
+              54,
+              73,
+              107,
+              112,
+              88,
+              86,
+              67,
+              74,
+              57,
+              46,
+              101,
+              121,
+              74,
+              108,
+              98,
+              87,
+              70,
+              112,
+              98,
+              67,
+              73,
+              54,
+              73,
+              110,
+              70,
+              104,
+              100,
+              71,
+              86,
+              122,
+              100,
+              70,
+              56,
+              120,
+              78,
+              122,
+              89,
+              48,
+              77,
+              106,
+              99,
+              48,
+              78,
+              84,
+              65,
+              49,
+              79,
+              84,
+              73,
+              50,
+              81,
+              71,
+              86,
+              52,
+              89,
+              87,
+              49,
+              119,
+              98,
+              71,
+              85,
+              117,
+              89,
+              50,
+              57,
+              116,
+              73,
+              105,
+              119,
+              105,
+              97,
+              87,
+              70,
+              48,
+              73,
+              106,
+              111,
+              120,
+              78,
+              122,
+              89,
+              48,
+              77,
+              106,
+              99,
+              48,
+              78,
+              84,
+              65,
+              53,
+              102,
+              81,
+              46,
+              103,
+              82,
+              119,
+              102,
+              97,
+              49,
+              57,
+              76,
+              113,
+              116,
+              110,
+              87,
+              52,
+              120,
+              119,
+              97,
+              103,
+              48,
+              84,
+              95,
+              117,
+              82,
+              106,
+              105,
+              72,
+              83,
+              87,
+              66,
+              112,
+              110,
+              73,
+              68,
+              75,
+              68,
+              67,
+              45,
+              72,
+              119,
+              110,
+              121,
+              90,
+              108,
+              115,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 64,
+          "responseSize": 175
+        },
+        "id": "2fc64c53-a56d-463c-876e-d32ba423a7fc",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Response has JWT token field",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Token is non-empty string",
+            "skipped": false
+          },
+          {
+            "assertion": "[FORMAT] Token is valid JWT format",
+            "skipped": false
+          },
+          {
+            "assertion": "[STATE] Token stored in environment",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "763fec27-9d24-4d55-a190-430cba8cff25",
+          "length": 17,
+          "cycles": 1,
+          "position": 4,
+          "iteration": 0,
+          "httpRequestId": "07682413-78cf-4281-ad92-2ef66df22bb7"
+        },
+        "item": {
+          "id": "dcab9280-9a85-4cfe-88c1-4711cbeef30a",
+          "name": "Login - Invalid Credentials (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "login"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"nonexistent@example.com\", \"password\": \"WrongPassword\"}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "dbbad2cd-9a29-4c81-b019-5c7f09317c06",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[AUTH] Should reject invalid credentials with 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "_lastExecutionId": "d3384c7e-252b-4030-9734-761bbbf437a9"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "login"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "1e9c0405-6d64-406c-baaf-87c3ad60f33b",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "65",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\"email\": \"nonexistent@example.com\", \"password\": \"WrongPassword\"}"
+          }
+        },
+        "response": {
+          "id": "63e95666-7c30-41f4-9e3d-21a5d56fa6f3",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"1f-rfAixkGYZBMr11IBt1FTI7XHsyA\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "815b18b49b6fdc791b9a8baa80445ea2"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "31"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              85,
+              115,
+              101,
+              114,
+              32,
+              110,
+              111,
+              116,
+              32,
+              114,
+              101,
+              103,
+              105,
+              115,
+              116,
+              101,
+              114,
+              101,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 58,
+          "responseSize": 31
+        },
+        "id": "dcab9280-9a85-4cfe-88c1-4711cbeef30a",
+        "assertions": [
+          {
+            "assertion": "[AUTH] Should reject invalid credentials with 401",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "554cc135-b0f7-4eff-ae7f-c9f0bd7e8efd",
+          "length": 17,
+          "cycles": 1,
+          "position": 5,
+          "iteration": 0,
+          "httpRequestId": "d4d8d37d-328e-4031-bf7a-b7470dc3a0bf"
+        },
+        "item": {
+          "id": "d9d573dd-e802-4913-8407-4778fcfb44d8",
+          "name": "Get All Products",
+          "request": {
+            "url": {
+              "path": [
+                "products"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "0c074117-c273-4d0b-9bbe-7c99e7e17023",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "",
+                  "pm.test('[SCHEMA] Response is array', function () {",
+                  "    pm.expect(Array.isArray(pm.response.json())).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Array is not empty', function () {",
+                  "    pm.expect(pm.response.json().length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Each product has required fields', function () {",
+                  "    var products = pm.response.json();",
+                  "    products.forEach(function(p) {",
+                  "        pm.expect(p).to.have.property('id');",
+                  "        pm.expect(p).to.have.property('name');",
+                  "        pm.expect(p).to.have.property('price');",
+                  "        pm.expect(p).to.have.property('stock');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Field types are correct', function () {",
+                  "    var products = pm.response.json();",
+                  "    products.forEach(function(p) {",
+                  "        pm.expect(p.id).to.be.a('number');",
+                  "        pm.expect(p.name).to.be.a('string');",
+                  "        pm.expect(p.price).to.be.a('number');",
+                  "        pm.expect(p.stock).to.be.a('number');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('[VALIDATION] Price is non-negative', function () {",
+                  "    var products = pm.response.json();",
+                  "    products.forEach(function(p) {",
+                  "        pm.expect(p.price).to.be.at.least(0);",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('[BUG] Stock should not be negative', function () {",
+                  "    var products = pm.response.json();",
+                  "    var negatives = products.filter(p => p.stock < 0);",
+                  "    if (negatives.length > 0) {",
+                  "        console.warn('BUG FOUND: Products with negative stock:', negatives);",
+                  "    }",
+                  "});"
+                ],
+                "_lastExecutionId": "f575bec2-a3ec-47e2-a05f-7dbf632721e0"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "products"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "feb09140-ff86-4367-83f2-4f49d36c8a5c",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "88f20c4a-34b2-4b3b-804c-5895677dc1c6",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"f8-+Bo0f9vVG7vQkCjw4jkKJPMyS0w\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "d6f8a8848185789a1b9a8baa80445233"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "248"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              91,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              49,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              76,
+              97,
+              112,
+              116,
+              111,
+              112,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              49,
+              48,
+              48,
+              48,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              48,
+              125,
+              44,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              50,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              75,
+              101,
+              121,
+              98,
+              111,
+              97,
+              114,
+              100,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              53,
+              48,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              49,
+              48,
+              125,
+              44,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              51,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              77,
+              111,
+              117,
+              115,
+              101,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              50,
+              53,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              45,
+              49,
+              125,
+              44,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              52,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              84,
+              97,
+              115,
+              116,
+              97,
+              116,
+              195,
+              188,
+              114,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              55,
+              48,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              51,
+              125,
+              44,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              57,
+              57,
+              57,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              76,
+              101,
+              103,
+              97,
+              99,
+              121,
+              32,
+              68,
+              101,
+              118,
+              105,
+              99,
+              101,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              48,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              57,
+              57,
+              125,
+              93
+            ]
+          },
+          "cookie": [],
+          "responseTime": 57,
+          "responseSize": 248
+        },
+        "id": "d9d573dd-e802-4913-8407-4778fcfb44d8",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Response is array",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Array is not empty",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Each product has required fields",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Field types are correct",
+            "skipped": false
+          },
+          {
+            "assertion": "[VALIDATION] Price is non-negative",
+            "skipped": false
+          },
+          {
+            "assertion": "[BUG] Stock should not be negative",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "251fc9ec-ead8-4294-abdb-cb9712096edb",
+          "length": 17,
+          "cycles": 1,
+          "position": 6,
+          "iteration": 0,
+          "httpRequestId": "c9385c65-ed5f-44c5-abd1-34012bdd6525"
+        },
+        "item": {
+          "id": "62dc8374-dccb-4bcf-be8a-cb5e42d787bb",
+          "name": "Get Product by ID",
+          "request": {
+            "url": {
+              "path": [
+                "products",
+                "1"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "c801254b-3562-4ccf-bb48-808bc3aab6f4",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "",
+                  "pm.test('[SCHEMA] Response is object', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Has base product fields', function () {",
+                  "    var p = pm.response.json();",
+                  "    pm.expect(p).to.have.property('id');",
+                  "    pm.expect(p).to.have.property('name');",
+                  "    pm.expect(p).to.have.property('price');",
+                  "    pm.expect(p).to.have.property('stock');",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Field types correct', function () {",
+                  "    var p = pm.response.json();",
+                  "    pm.expect(p.id).to.be.a('number');",
+                  "    pm.expect(p.name).to.be.a('string');",
+                  "    pm.expect(p.price).to.be.a('number');",
+                  "    pm.expect(p.stock).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Detailed product has description', function () {",
+                  "    var p = pm.response.json();",
+                  "    if (p.isDetailed === true) {",
+                  "        pm.expect(p).to.have.property('description');",
+                  "        pm.expect(p.description).to.be.a('string');",
+                  "    }",
+                  "});",
+                  "",
+                  "pm.test('[DATA] Product ID matches request', function () {",
+                  "    var p = pm.response.json();",
+                  "    pm.expect(p.id).to.equal(1);",
+                  "});"
+                ],
+                "_lastExecutionId": "c6464d1c-600a-44fb-bc9d-d0523be56512"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "products",
+              "1"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "a9ac82f0-6a3b-461b-b791-11bfac0c65f1",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "2a9d5ae9-75d2-4e73-b205-4d72fa642b14",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"84-nYURdcR21MJvGGpA6r1/lRjfUDQ\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "d7d595d9b8ea9fc11b9a8baa8044553a"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "132"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              49,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              76,
+              97,
+              112,
+              116,
+              111,
+              112,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              49,
+              48,
+              48,
+              48,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              48,
+              44,
+              34,
+              105,
+              115,
+              68,
+              101,
+              116,
+              97,
+              105,
+              108,
+              101,
+              100,
+              34,
+              58,
+              116,
+              114,
+              117,
+              101,
+              44,
+              34,
+              100,
+              101,
+              115,
+              99,
+              114,
+              105,
+              112,
+              116,
+              105,
+              111,
+              110,
+              34,
+              58,
+              34,
+              72,
+              105,
+              103,
+              104,
+              45,
+              101,
+              110,
+              100,
+              32,
+              103,
+              97,
+              109,
+              105,
+              110,
+              103,
+              32,
+              108,
+              97,
+              112,
+              116,
+              111,
+              112,
+              32,
+              119,
+              105,
+              116,
+              104,
+              32,
+              101,
+              120,
+              99,
+              101,
+              108,
+              108,
+              101,
+              110,
+              116,
+              32,
+              112,
+              101,
+              114,
+              102,
+              111,
+              114,
+              109,
+              97,
+              110,
+              99,
+              101,
+              46,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 57,
+          "responseSize": 132
+        },
+        "id": "62dc8374-dccb-4bcf-be8a-cb5e42d787bb",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Response is object",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Has base product fields",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Field types correct",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Detailed product has description",
+            "skipped": false
+          },
+          {
+            "assertion": "[DATA] Product ID matches request",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "bb14f022-5268-47d3-8be3-eec1e0dafa15",
+          "length": 17,
+          "cycles": 1,
+          "position": 7,
+          "iteration": 0,
+          "httpRequestId": "0bd909eb-3cd0-4acd-816f-6facc6e5d864"
+        },
+        "item": {
+          "id": "869b8931-f4be-42b9-bb72-81e80ba3df4a",
+          "name": "Search Product by Name (Exact Match)",
+          "request": {
+            "url": {
+              "path": [
+                "products"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "Laptop"
+                }
+              ],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "568250f9-847e-4ce1-b976-67ac2b6dde8d",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "",
+                  "pm.test('[SCHEMA] Response is array', function () {",
+                  "    pm.expect(Array.isArray(pm.response.json())).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('[SEARCH] Returns matching products', function () {",
+                  "    var results = pm.response.json();",
+                  "    pm.expect(results.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('[CASE-SENSITIVE] Search is case-sensitive', function () {",
+                  "    var results = pm.response.json();",
+                  "    results.forEach(p => pm.expect(p.name).to.equal('Laptop'));",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Results have required fields', function () {",
+                  "    var results = pm.response.json();",
+                  "    results.forEach(p => {",
+                  "        pm.expect(p).to.have.property('id');",
+                  "        pm.expect(p).to.have.property('name');",
+                  "        pm.expect(p).to.have.property('price');",
+                  "        pm.expect(p).to.have.property('stock');",
+                  "    });",
+                  "});"
+                ],
+                "_lastExecutionId": "9fe75aff-0126-4643-a2e9-3a4ab8721567"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "products"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [
+              {
+                "key": "name",
+                "value": "Laptop"
+              }
+            ],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "02bdf7b8-8efb-4ac2-b3bd-f24de77cd831",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "58690601-7f4e-4b7a-a9f1-a7052e588ccf",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"31-qXKTft1/uLFKHw7MZA0O8/4VWwc\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "a04329ddaf3982c51b9a8baa8044539c"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "49"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              91,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              49,
+              44,
+              34,
+              110,
+              97,
+              109,
+              101,
+              34,
+              58,
+              34,
+              76,
+              97,
+              112,
+              116,
+              111,
+              112,
+              34,
+              44,
+              34,
+              112,
+              114,
+              105,
+              99,
+              101,
+              34,
+              58,
+              49,
+              48,
+              48,
+              48,
+              44,
+              34,
+              115,
+              116,
+              111,
+              99,
+              107,
+              34,
+              58,
+              48,
+              125,
+              93
+            ]
+          },
+          "cookie": [],
+          "responseTime": 60,
+          "responseSize": 49
+        },
+        "id": "869b8931-f4be-42b9-bb72-81e80ba3df4a",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Response is array",
+            "skipped": false
+          },
+          {
+            "assertion": "[SEARCH] Returns matching products",
+            "skipped": false
+          },
+          {
+            "assertion": "[CASE-SENSITIVE] Search is case-sensitive",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Results have required fields",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "914dce81-b939-41ac-837f-f5156a90aa1c",
+          "length": 17,
+          "cycles": 1,
+          "position": 8,
+          "iteration": 0,
+          "httpRequestId": "3d3f94f8-3a94-4e43-ad8c-ee13085b21a8"
+        },
+        "item": {
+          "id": "7ed2f672-c9c5-462a-a0d3-26295e1976b9",
+          "name": "Search - Case Mismatch (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "products"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [
+                {
+                  "key": "name",
+                  "value": "laptop"
+                }
+              ],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "b4ffc3cb-4fa0-40ef-bf42-baa6edc7a135",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[CASE-SENSITIVE] Lowercase search returns empty', function () {",
+                  "    var results = pm.response.json();",
+                  "    pm.expect(results).to.be.an('array');",
+                  "    pm.expect(results.length).to.equal(0);",
+                  "});"
+                ],
+                "_lastExecutionId": "87fc1166-f253-4670-9894-c425b22b61af"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "products"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [
+              {
+                "key": "name",
+                "value": "laptop"
+              }
+            ],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "0e496700-fbea-4a26-b330-710b2b834f3c",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "457cde2d-de83-4ddd-afba-d3865c7678f8",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"2-l9Fw4VUO7kr8CvBlt4zaMCqXZ0w\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "476cd2eaeee01aaf1b9a8baa80445cb8"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "2"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              91,
+              93
+            ]
+          },
+          "cookie": [],
+          "responseTime": 64,
+          "responseSize": 2
+        },
+        "id": "7ed2f672-c9c5-462a-a0d3-26295e1976b9",
+        "assertions": [
+          {
+            "assertion": "[CASE-SENSITIVE] Lowercase search returns empty",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "62837ed4-f2c8-4b69-856a-96e841471b28",
+          "length": 17,
+          "cycles": 1,
+          "position": 9,
+          "iteration": 0,
+          "httpRequestId": "d20dd5ca-1266-41d2-aa09-1050d6aa38b1"
+        },
+        "item": {
+          "id": "1ee2cc0d-4684-4051-87ad-790a693f93c6",
+          "name": "Get Non-existent Product (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "products",
+                "99999"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "3673b407-b09c-4b1d-bfee-3a52d5c37c2b",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Returns 404 for non-existent ID', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "_lastExecutionId": "c1c6473c-475a-45fa-a548-94c9bf56a073"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "products",
+              "99999"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "26a523dc-368f-482b-aa5b-9c56dc8a8965",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "3ebb16c9-6b5f-4001-8f68-3fb1de6e8836",
+          "status": "Not Found",
+          "code": 404,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "text/html; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"9-R1yEhnOj95+nePAcK9WnIdTEFwc\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "3f15de2db092259c1b9a8baa80445fd6"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "9"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              78,
+              111,
+              116,
+              32,
+              102,
+              111,
+              117,
+              110,
+              100
+            ]
+          },
+          "cookie": [],
+          "responseTime": 60,
+          "responseSize": 9
+        },
+        "id": "1ee2cc0d-4684-4051-87ad-790a693f93c6",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Returns 404 for non-existent ID",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "708ad9a8-de99-4ed5-8af7-511dadcd93c3",
+          "length": 17,
+          "cycles": 1,
+          "position": 10,
+          "iteration": 0,
+          "httpRequestId": "9245a698-df53-4251-8007-942c931b8cb6"
+        },
+        "item": {
+          "id": "1a8e965b-60d9-41bb-ab78-b55b85e2879f",
+          "name": "Create Order (Authenticated)",
+          "request": {
+            "url": {
+              "path": [
+                "orders"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"products\": [1, 2]}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "7f3642f5-0368-4a29-a57a-600551dddd41",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "",
+                  "pm.test('[SCHEMA] Response has required fields', function () {",
+                  "    var order = pm.response.json();",
+                  "    pm.expect(order).to.have.property('id');",
+                  "    pm.expect(order).to.have.property('user');",
+                  "    pm.expect(order).to.have.property('products');",
+                  "    pm.expect(order).to.have.property('total');",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Field types are correct', function () {",
+                  "    var order = pm.response.json();",
+                  "    pm.expect(order.id).to.be.a('string');",
+                  "    pm.expect(order.user).to.be.a('string');",
+                  "    pm.expect(Array.isArray(order.products)).to.be.true;",
+                  "    pm.expect(order.total).to.be.a('number');",
+                  "});",
+                  "",
+                  "pm.test('[VALIDATION] Total is positive', function () {",
+                  "    var order = pm.response.json();",
+                  "    pm.expect(order.total).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('[VALIDATION] Order ID is non-empty', function () {",
+                  "    var order = pm.response.json();",
+                  "    pm.expect(order.id.length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('[BUSINESS] User matches authenticated user', function () {",
+                  "    var order = pm.response.json();",
+                  "    pm.expect(order.user).to.equal(pm.environment.get('unique_email'));",
+                  "});",
+                  "",
+                  "pm.test('[STATE] Store order ID for later use', function () {",
+                  "    var order = pm.response.json();",
+                  "    pm.environment.set('order_id', order.id);",
+                  "});"
+                ],
+                "_lastExecutionId": "b34f4193-c052-414c-9924-2723ec4ff7c7"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "orders"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InFhdGVzdF8xNzY0Mjc0NTA1OTI2QGV4YW1wbGUuY29tIiwiaWF0IjoxNzY0Mjc0NTA5fQ.gRwfa19LqtnW4xwag0T_uRjiHSWBpnIDKDC-HwnyZls"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "f26ff2bd-d2f3-41ed-a49b-694df9a7c37d",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "20",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\"products\": [1, 2]}"
+          }
+        },
+        "response": {
+          "id": "5835701e-6eed-40e2-8f46-0979ca220001",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"61-5nA0tVpApC1laAZCNl4AAW21VI8\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "e54cd4afb27f8c7b1b9a8baa80445367"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "97"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              49,
+              55,
+              54,
+              52,
+              50,
+              55,
+              52,
+              53,
+              48,
+              57,
+              54,
+              56,
+              52,
+              52,
+              53,
+              56,
+              34,
+              44,
+              34,
+              117,
+              115,
+              101,
+              114,
+              34,
+              58,
+              34,
+              113,
+              97,
+              116,
+              101,
+              115,
+              116,
+              95,
+              49,
+              55,
+              54,
+              52,
+              50,
+              55,
+              52,
+              53,
+              48,
+              53,
+              57,
+              50,
+              54,
+              64,
+              101,
+              120,
+              97,
+              109,
+              112,
+              108,
+              101,
+              46,
+              99,
+              111,
+              109,
+              34,
+              44,
+              34,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              115,
+              34,
+              58,
+              91,
+              49,
+              44,
+              50,
+              93,
+              44,
+              34,
+              116,
+              111,
+              116,
+              97,
+              108,
+              34,
+              58,
+              49,
+              48,
+              53,
+              48,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 61,
+          "responseSize": 97
+        },
+        "id": "1a8e965b-60d9-41bb-ab78-b55b85e2879f",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Response has required fields",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Field types are correct",
+            "skipped": false
+          },
+          {
+            "assertion": "[VALIDATION] Total is positive",
+            "skipped": false
+          },
+          {
+            "assertion": "[VALIDATION] Order ID is non-empty",
+            "skipped": false
+          },
+          {
+            "assertion": "[BUSINESS] User matches authenticated user",
+            "skipped": false
+          },
+          {
+            "assertion": "[STATE] Store order ID for later use",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "99a52572-78d3-4269-9ebe-6c681a62fcbe",
+          "length": 17,
+          "cycles": 1,
+          "position": 11,
+          "iteration": 0,
+          "httpRequestId": "71645376-0933-4fdc-8d2e-4da123305cdc"
+        },
+        "item": {
+          "id": "bbdadffc-dd1f-41ca-bfcf-e26d02315129",
+          "name": "Create Order - No Auth (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "orders"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"products\": [1, 2]}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "b517d732-7bf9-48ef-9fc7-2b58757733b4",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[AUTH] Requires authentication with 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "_lastExecutionId": "7c7ab32f-29c6-4f0b-ae8c-d0d62d0864f4"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "orders"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "e607d8bd-bed2-4278-9aa7-6100c93b59c5",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "20",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\"products\": [1, 2]}"
+          }
+        },
+        "response": {
+          "id": "5b9cc9bf-87f8-4d71-9892-9b5e68e0d341",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"18-XPDV80vbMk4yY1/PADG4jYM4rSI\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "955c16b585ea5a611b9a8baa804451b2"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "24"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              85,
+              110,
+              97,
+              117,
+              116,
+              104,
+              111,
+              114,
+              105,
+              122,
+              101,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 58,
+          "responseSize": 24
+        },
+        "id": "bbdadffc-dd1f-41ca-bfcf-e26d02315129",
+        "assertions": [
+          {
+            "assertion": "[AUTH] Requires authentication with 401",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "17971a50-6feb-4552-81e4-8e8ede3b14ad",
+          "length": 17,
+          "cycles": 1,
+          "position": 12,
+          "iteration": 0,
+          "httpRequestId": "3bb2dd48-bdee-4b45-a548-0068d3ee8414"
+        },
+        "item": {
+          "id": "6f7997cd-80dd-40df-8995-fac30c6961e0",
+          "name": "Create Order - Invalid Token (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "orders"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer invalid.token.here"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"products\": [1, 2]}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "688447bd-9adc-4f03-9f30-77cdb7bd2987",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[AUTH] Rejects invalid token with 403', function () {",
+                  "    pm.response.to.have.status(403);",
+                  "});"
+                ],
+                "_lastExecutionId": "7b1d02d0-14d8-4bd8-8ac7-c4e399e19509"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "orders"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer invalid.token.here"
+            },
+            {
+              "key": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "532899c1-f6d2-4a51-8354-cc7024b1db0e",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            },
+            {
+              "key": "Content-Length",
+              "value": "20",
+              "system": true
+            }
+          ],
+          "method": "POST",
+          "body": {
+            "mode": "raw",
+            "raw": "{\"products\": [1, 2]}"
+          }
+        },
+        "response": {
+          "id": "9b0feb3d-23ae-4951-8e35-11ab55b477bc",
+          "status": "Forbidden",
+          "code": 403,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"19-1luTU257I9tvKUXOJotGBQDVDqk\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "0460bab74a2928b61b9a8baa80445515"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "25"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              73,
+              110,
+              118,
+              97,
+              108,
+              105,
+              100,
+              32,
+              116,
+              111,
+              107,
+              101,
+              110,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 58,
+          "responseSize": 25
+        },
+        "id": "6f7997cd-80dd-40df-8995-fac30c6961e0",
+        "assertions": [
+          {
+            "assertion": "[AUTH] Rejects invalid token with 403",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "edfa8632-ba8e-4f22-9242-151ed3372837",
+          "length": 17,
+          "cycles": 1,
+          "position": 13,
+          "iteration": 0,
+          "httpRequestId": "a6641dd9-7ffd-4d7b-833c-7c0286f9cfc6"
+        },
+        "item": {
+          "id": "6cf21e2c-b0d3-4fe2-8e0c-e99e967e092e",
+          "name": "Get All Orders (Authenticated)",
+          "request": {
+            "url": {
+              "path": [
+                "orders"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "b98c5542-16ce-4980-a1f4-455cc80b815a",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "",
+                  "pm.test('[SCHEMA] Response is array', function () {",
+                  "    pm.expect(Array.isArray(pm.response.json())).to.be.true;",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Array contains orders', function () {",
+                  "    pm.expect(pm.response.json().length).to.be.greaterThan(0);",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Each order has required fields', function () {",
+                  "    var orders = pm.response.json();",
+                  "    orders.forEach(o => {",
+                  "        pm.expect(o).to.have.property('id');",
+                  "        pm.expect(o).to.have.property('user');",
+                  "        pm.expect(o).to.have.property('products');",
+                  "        pm.expect(o).to.have.property('total');",
+                  "    });",
+                  "});",
+                  "",
+                  "pm.test('[BUSINESS] All orders belong to current user', function () {",
+                  "    var orders = pm.response.json();",
+                  "    var userEmail = pm.environment.get('unique_email');",
+                  "    orders.forEach(o => pm.expect(o.user).to.equal(userEmail));",
+                  "});"
+                ],
+                "_lastExecutionId": "e2f169cc-319c-4163-a7e4-fc1eff954eb1"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "orders"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InFhdGVzdF8xNzY0Mjc0NTA1OTI2QGV4YW1wbGUuY29tIiwiaWF0IjoxNzY0Mjc0NTA5fQ.gRwfa19LqtnW4xwag0T_uRjiHSWBpnIDKDC-HwnyZls"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "14ff42bb-0828-470c-97f3-31caf447f0ae",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "6d3af610-aa39-4351-bbfb-82d3266dec6c",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"63-o6YI8Yz9UMC4TY32oBPQ4vfg/78\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "c9f928f4a2de4c431b9a8baa80445da7"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "99"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              91,
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              49,
+              55,
+              54,
+              52,
+              50,
+              55,
+              52,
+              53,
+              48,
+              57,
+              54,
+              56,
+              52,
+              52,
+              53,
+              56,
+              34,
+              44,
+              34,
+              117,
+              115,
+              101,
+              114,
+              34,
+              58,
+              34,
+              113,
+              97,
+              116,
+              101,
+              115,
+              116,
+              95,
+              49,
+              55,
+              54,
+              52,
+              50,
+              55,
+              52,
+              53,
+              48,
+              53,
+              57,
+              50,
+              54,
+              64,
+              101,
+              120,
+              97,
+              109,
+              112,
+              108,
+              101,
+              46,
+              99,
+              111,
+              109,
+              34,
+              44,
+              34,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              115,
+              34,
+              58,
+              91,
+              49,
+              44,
+              50,
+              93,
+              44,
+              34,
+              116,
+              111,
+              116,
+              97,
+              108,
+              34,
+              58,
+              49,
+              48,
+              53,
+              48,
+              125,
+              93
+            ]
+          },
+          "cookie": [],
+          "responseTime": 61,
+          "responseSize": 99
+        },
+        "id": "6cf21e2c-b0d3-4fe2-8e0c-e99e967e092e",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Response is array",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Array contains orders",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Each order has required fields",
+            "skipped": false
+          },
+          {
+            "assertion": "[BUSINESS] All orders belong to current user",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "6ff09979-56cd-45f0-a4ca-2a3fa4b055c0",
+          "length": 17,
+          "cycles": 1,
+          "position": 14,
+          "iteration": 0,
+          "httpRequestId": "5f31d4e1-9dc5-4114-b5d8-f4488e425e12"
+        },
+        "item": {
+          "id": "b32e7840-1818-4d1b-9d31-4d4cb7e22969",
+          "name": "Get All Orders - No Auth (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "orders"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "07d1c238-87c8-4c31-99f3-233d4d5f14b3",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[AUTH] Requires authentication with 401', function () {",
+                  "    pm.response.to.have.status(401);",
+                  "});"
+                ],
+                "_lastExecutionId": "d95387d8-f67c-4819-9123-f47db18bffac"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "orders"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "eb660567-f5dc-4a42-b2a2-8b8010afa1a8",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "c47a33d0-6bc3-4ece-85f2-d1f18ab1bfe5",
+          "status": "Unauthorized",
+          "code": 401,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"19-q2Bm7+mdFWdZjGQKaYxoPxF28os\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "f81745edfc1207d41b9a8baa80445194"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:09 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "25"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              77,
+              105,
+              115,
+              115,
+              105,
+              110,
+              103,
+              32,
+              116,
+              111,
+              107,
+              101,
+              110,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 57,
+          "responseSize": 25
+        },
+        "id": "b32e7840-1818-4d1b-9d31-4d4cb7e22969",
+        "assertions": [
+          {
+            "assertion": "[AUTH] Requires authentication with 401",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "70abec3f-82af-44a1-ad35-59ff5ae2d5f4",
+          "length": 17,
+          "cycles": 1,
+          "position": 15,
+          "iteration": 0,
+          "httpRequestId": "be863c50-4561-4b24-9c42-4a45fd2f6ef8"
+        },
+        "item": {
+          "id": "573ea27c-ddca-4d00-a4b0-a75d6a676a81",
+          "name": "Get Order by ID",
+          "request": {
+            "url": {
+              "path": [
+                "orders",
+                "{{order_id}}"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "da8d2026-e2f6-4bb4-9271-52f6dfaa94c9",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Status code is 200', function () { pm.response.to.have.status(200); });",
+                  "",
+                  "pm.test('[SCHEMA] Response is object', function () {",
+                  "    pm.expect(pm.response.json()).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('[SCHEMA] Has required fields', function () {",
+                  "    var order = pm.response.json();",
+                  "    pm.expect(order).to.have.property('id');",
+                  "    pm.expect(order).to.have.property('user');",
+                  "    pm.expect(order).to.have.property('products');",
+                  "    pm.expect(order).to.have.property('total');",
+                  "});",
+                  "",
+                  "pm.test('[BUSINESS] Order ID matches request', function () {",
+                  "    var order = pm.response.json();",
+                  "    pm.expect(order.id).to.equal(pm.environment.get('order_id'));",
+                  "});",
+                  "",
+                  "pm.test('[BUSINESS] User can only access own orders', function () {",
+                  "    var order = pm.response.json();",
+                  "    pm.expect(order.user).to.equal(pm.environment.get('unique_email'));",
+                  "});"
+                ],
+                "_lastExecutionId": "9cbeb414-07f0-45d2-b73f-99b32c30c121"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "orders",
+              "1764274509684458"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InFhdGVzdF8xNzY0Mjc0NTA1OTI2QGV4YW1wbGUuY29tIiwiaWF0IjoxNzY0Mjc0NTA5fQ.gRwfa19LqtnW4xwag0T_uRjiHSWBpnIDKDC-HwnyZls"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "8a75adb9-5238-417a-8e63-68c7c8621028",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "f943fe62-c540-49c7-8af8-3fa1c75e416c",
+          "status": "OK",
+          "code": 200,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"61-5nA0tVpApC1laAZCNl4AAW21VI8\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "e81ad796a569e4c41b9a8baa80445a6b"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:10 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "97"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              105,
+              100,
+              34,
+              58,
+              34,
+              49,
+              55,
+              54,
+              52,
+              50,
+              55,
+              52,
+              53,
+              48,
+              57,
+              54,
+              56,
+              52,
+              52,
+              53,
+              56,
+              34,
+              44,
+              34,
+              117,
+              115,
+              101,
+              114,
+              34,
+              58,
+              34,
+              113,
+              97,
+              116,
+              101,
+              115,
+              116,
+              95,
+              49,
+              55,
+              54,
+              52,
+              50,
+              55,
+              52,
+              53,
+              48,
+              53,
+              57,
+              50,
+              54,
+              64,
+              101,
+              120,
+              97,
+              109,
+              112,
+              108,
+              101,
+              46,
+              99,
+              111,
+              109,
+              34,
+              44,
+              34,
+              112,
+              114,
+              111,
+              100,
+              117,
+              99,
+              116,
+              115,
+              34,
+              58,
+              91,
+              49,
+              44,
+              50,
+              93,
+              44,
+              34,
+              116,
+              111,
+              116,
+              97,
+              108,
+              34,
+              58,
+              49,
+              48,
+              53,
+              48,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 63,
+          "responseSize": 97
+        },
+        "id": "573ea27c-ddca-4d00-a4b0-a75d6a676a81",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Status code is 200",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Response is object",
+            "skipped": false
+          },
+          {
+            "assertion": "[SCHEMA] Has required fields",
+            "skipped": false
+          },
+          {
+            "assertion": "[BUSINESS] Order ID matches request",
+            "skipped": false
+          },
+          {
+            "assertion": "[BUSINESS] User can only access own orders",
+            "skipped": false
+          }
+        ]
+      },
+      {
+        "cursor": {
+          "ref": "54114342-890d-4705-9308-21a5c29522cb",
+          "length": 17,
+          "cycles": 1,
+          "position": 16,
+          "iteration": 0,
+          "httpRequestId": "485eb41d-10db-43eb-bee0-fc9fc8897acb"
+        },
+        "item": {
+          "id": "51ee4e2a-6206-4cb0-93c3-b21bdbced470",
+          "name": "Get Non-existent Order (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "orders",
+                "99999999999"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{auth_token}}"
+              }
+            ],
+            "method": "GET"
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "31dbbbbb-6b68-4626-97ef-fe37430f460d",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[HTTP] Returns 404 for non-existent order', function () {",
+                  "    pm.response.to.have.status(404);",
+                  "});"
+                ],
+                "_lastExecutionId": "b66b5879-ecc2-443c-a8d9-18d8b2fca54c"
+              }
+            }
+          ]
+        },
+        "request": {
+          "url": {
+            "protocol": "https",
+            "path": [
+              "api",
+              "orders",
+              "99999999999"
+            ],
+            "host": [
+              "us-central1-nn-api-challenge",
+              "cloudfunctions",
+              "net"
+            ],
+            "query": [],
+            "variable": []
+          },
+          "header": [
+            {
+              "key": "Authorization",
+              "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InFhdGVzdF8xNzY0Mjc0NTA1OTI2QGV4YW1wbGUuY29tIiwiaWF0IjoxNzY0Mjc0NTA5fQ.gRwfa19LqtnW4xwag0T_uRjiHSWBpnIDKDC-HwnyZls"
+            },
+            {
+              "key": "User-Agent",
+              "value": "PostmanRuntime/7.39.1",
+              "system": true
+            },
+            {
+              "key": "Accept",
+              "value": "*/*",
+              "system": true
+            },
+            {
+              "key": "Cache-Control",
+              "value": "no-cache",
+              "system": true
+            },
+            {
+              "key": "Postman-Token",
+              "value": "e7a40ada-b628-437b-aa55-7201b9b26181",
+              "system": true
+            },
+            {
+              "key": "Host",
+              "value": "us-central1-nn-api-challenge.cloudfunctions.net",
+              "system": true
+            },
+            {
+              "key": "Accept-Encoding",
+              "value": "gzip, deflate, br",
+              "system": true
+            },
+            {
+              "key": "Connection",
+              "value": "keep-alive",
+              "system": true
+            }
+          ],
+          "method": "GET"
+        },
+        "response": {
+          "id": "8e68ddd3-c0c6-4f59-82a7-66ec688ad2be",
+          "status": "Not Found",
+          "code": 404,
+          "header": [
+            {
+              "key": "x-powered-by",
+              "value": "Express"
+            },
+            {
+              "key": "vary",
+              "value": "Origin"
+            },
+            {
+              "key": "content-type",
+              "value": "application/json; charset=utf-8"
+            },
+            {
+              "key": "etag",
+              "value": "W/\"1b-G7RX01EQFHhrsSpXHe3p7uxrQrs\""
+            },
+            {
+              "key": "x-cloud-trace-context",
+              "value": "577d8d7b5bbeb0031b9a8baa80445888"
+            },
+            {
+              "key": "date",
+              "value": "Thu, 27 Nov 2025 20:15:10 GMT"
+            },
+            {
+              "key": "server",
+              "value": "Google Frontend"
+            },
+            {
+              "key": "Content-Length",
+              "value": "27"
+            },
+            {
+              "key": "Alt-Svc",
+              "value": "h3=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000"
+            }
+          ],
+          "stream": {
+            "type": "Buffer",
+            "data": [
+              123,
+              34,
+              101,
+              114,
+              114,
+              111,
+              114,
+              34,
+              58,
+              34,
+              79,
+              114,
+              100,
+              101,
+              114,
+              32,
+              110,
+              111,
+              116,
+              32,
+              102,
+              111,
+              117,
+              110,
+              100,
+              34,
+              125
+            ]
+          },
+          "cookie": [],
+          "responseTime": 67,
+          "responseSize": 27
+        },
+        "id": "51ee4e2a-6206-4cb0-93c3-b21bdbced470",
+        "assertions": [
+          {
+            "assertion": "[HTTP] Returns 404 for non-existent order",
+            "skipped": false
+          }
+        ]
+      }
+    ],
+    "transfers": {
+      "responseTotal": 1127
+    },
+    "failures": [
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 1,
+          "test": "[HTTP] Status code must be 409 Conflict",
+          "message": "expected response to have status code 409 but got 201",
+          "stack": "AssertionError: expected response to have status code 409 but got 201\n   at Object.eval sandbox-script.js:2:2)",
+          "checksum": "c0273e96925dfe17572930b089af1e60",
+          "id": "91e1c342-0d93-4d2a-899c-a297114575a6",
+          "timestamp": 1764274509019,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 2,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "8c63fdd6-42e2-422c-abd8-41280f7a7ea7",
+          "name": "Register - Missing Email (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "register"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"password\": \"{{test_password}}\"}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "6031c9b4-5752-4806-af04-5cb3668f9cf9",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[VALIDATION] Missing email test executed', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('[VALIDATION] API rejects missing required email field', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('object');",
+                  "});"
+                ],
+                "_lastExecutionId": "612d9f88-91c5-4176-9edb-20f9ef20bae4"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "166b2de2-5753-44b2-8dd6-28afa5aea48e",
+          "name": "Setup - Register & Login",
+          "item": [
+            {
+              "id": "16f16b43-7457-41b7-a632-e4e76bb83a64",
+              "name": "Register New User",
+              "request": {
+                "url": {
+                  "path": [
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\": \"{{unique_email}}\", \"password\": \"{{test_password}}\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "511978fa-f7b3-43d2-8881-09d353286583",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.environment.set('unique_email', 'qatest_' + Date.now() + '@example.com');"
+                    ],
+                    "_lastExecutionId": "48e0d25e-a8e5-4b44-8561-fd33cb3af8c3"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "eb6c795d-5701-47e2-afd9-85f690efdf47",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[HTTP] Status code must be 201 Created', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('[SCHEMA] Response contains required fields', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('message');",
+                      "    pm.expect(jsonData.message).to.be.a('string');",
+                      "});",
+                      "",
+                      "pm.test('[SCHEMA] Message includes registered keyword', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.message.toLowerCase()).to.include('registered');",
+                      "});",
+                      "",
+                      "pm.test('[DATA] Email stored correctly', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(pm.environment.get('unique_email')).to.be.a('string');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "f24d7ceb-16b2-4935-831a-d9fe04df8a7e"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "8c63fdd6-42e2-422c-abd8-41280f7a7ea7",
+              "name": "Register - Missing Email (Negative)",
+              "request": {
+                "url": {
+                  "path": [
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"password\": \"{{test_password}}\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "6031c9b4-5752-4806-af04-5cb3668f9cf9",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[VALIDATION] Missing email test executed', function () {",
+                      "    var response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('object');",
+                      "});",
+                      "",
+                      "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                      "    pm.response.to.have.status(409);",
+                      "});",
+                      "",
+                      "pm.test('[VALIDATION] API rejects missing required email field', function () {",
+                      "    var response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('object');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "612d9f88-91c5-4176-9edb-20f9ef20bae4"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "f456bfef-1925-4a32-acb7-59156975ee27",
+              "name": "Register - Missing Password (Negative)",
+              "request": {
+                "url": {
+                  "path": [
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\": \"test@example.com\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "64aeb694-1017-4db3-bd5b-74aeb0da3eff",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[VALIDATION] Missing password test executed', function () {",
+                      "    var response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('object');",
+                      "});",
+                      "",
+                      "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                      "    pm.response.to.have.status(409);",
+                      "});",
+                      "",
+                      "pm.test('[VALIDATION] API rejects missing required password field', function () {",
+                      "    var response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('object');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "4f682985-b896-4fd3-a377-4ff58cde96e2"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "2fc64c53-a56d-463c-876e-d32ba423a7fc",
+              "name": "Login Successfully",
+              "request": {
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\": \"{{unique_email}}\", \"password\": \"{{test_password}}\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "00943ddc-9ef9-42b6-82ea-f9e3d5d88a39",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[HTTP] Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('[SCHEMA] Response has JWT token field', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('token');",
+                      "});",
+                      "",
+                      "pm.test('[SCHEMA] Token is non-empty string', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.token).to.be.a('string');",
+                      "    pm.expect(jsonData.token.length).to.be.greaterThan(0);",
+                      "});",
+                      "",
+                      "pm.test('[FORMAT] Token is valid JWT format', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    var jwtRegex = /^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$/;",
+                      "    pm.expect(jwtRegex.test(jsonData.token)).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test('[STATE] Token stored in environment', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.environment.set('auth_token', jsonData.token);",
+                      "    pm.expect(pm.environment.get('auth_token')).to.equal(jsonData.token);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "b9c61876-ccbe-43f9-8a3c-cf8bb25f87f6"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "dcab9280-9a85-4cfe-88c1-4711cbeef30a",
+              "name": "Login - Invalid Credentials (Negative)",
+              "request": {
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\": \"nonexistent@example.com\", \"password\": \"WrongPassword\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "dbbad2cd-9a29-4c81-b019-5c7f09317c06",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[AUTH] Should reject invalid credentials with 401', function () {",
+                      "    pm.response.to.have.status(401);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "d3384c7e-252b-4030-9734-761bbbf437a9"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "a6b7f350-f268-4f34-85f4-0775f3091ff5",
+          "length": 17,
+          "cycles": 1,
+          "position": 1,
+          "iteration": 0,
+          "httpRequestId": "649ec277-2b03-4ecd-a7d5-e4321cc721a4",
+          "scriptId": "6031c9b4-5752-4806-af04-5cb3668f9cf9",
+          "execution": "612d9f88-91c5-4176-9edb-20f9ef20bae4"
+        }
+      },
+      {
+        "error": {
+          "name": "AssertionError",
+          "index": 1,
+          "test": "[HTTP] Status code must be 409 Conflict",
+          "message": "expected response to have status code 409 but got 201",
+          "stack": "AssertionError: expected response to have status code 409 but got 201\n   at Object.eval sandbox-script.js:2:3)",
+          "checksum": "ab710921664bd979a85f40f018e03e26",
+          "id": "78601857-fdc5-4629-a401-376ed52fc05a",
+          "timestamp": 1764274509100,
+          "stacktrace": [
+            {
+              "fileName": "sandbox-script.js",
+              "lineNumber": 2,
+              "functionName": "Object.eval",
+              "typeName": "Object",
+              "methodName": "eval",
+              "columnNumber": 3,
+              "native": false
+            }
+          ]
+        },
+        "at": "assertion:1 in test-script",
+        "source": {
+          "id": "f456bfef-1925-4a32-acb7-59156975ee27",
+          "name": "Register - Missing Password (Negative)",
+          "request": {
+            "url": {
+              "path": [
+                "register"
+              ],
+              "host": [
+                "{{base_url}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"email\": \"test@example.com\"}"
+            }
+          },
+          "response": [],
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "id": "64aeb694-1017-4db3-bd5b-74aeb0da3eff",
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('[VALIDATION] Missing password test executed', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('object');",
+                  "});",
+                  "",
+                  "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                  "    pm.response.to.have.status(409);",
+                  "});",
+                  "",
+                  "pm.test('[VALIDATION] API rejects missing required password field', function () {",
+                  "    var response = pm.response.json();",
+                  "    pm.expect(response).to.be.an('object');",
+                  "});"
+                ],
+                "_lastExecutionId": "4f682985-b896-4fd3-a377-4ff58cde96e2"
+              }
+            }
+          ]
+        },
+        "parent": {
+          "id": "166b2de2-5753-44b2-8dd6-28afa5aea48e",
+          "name": "Setup - Register & Login",
+          "item": [
+            {
+              "id": "16f16b43-7457-41b7-a632-e4e76bb83a64",
+              "name": "Register New User",
+              "request": {
+                "url": {
+                  "path": [
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\": \"{{unique_email}}\", \"password\": \"{{test_password}}\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "id": "511978fa-f7b3-43d2-8881-09d353286583",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.environment.set('unique_email', 'qatest_' + Date.now() + '@example.com');"
+                    ],
+                    "_lastExecutionId": "48e0d25e-a8e5-4b44-8561-fd33cb3af8c3"
+                  }
+                },
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "eb6c795d-5701-47e2-afd9-85f690efdf47",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[HTTP] Status code must be 201 Created', function () {",
+                      "    pm.response.to.have.status(201);",
+                      "});",
+                      "",
+                      "pm.test('[SCHEMA] Response contains required fields', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('message');",
+                      "    pm.expect(jsonData.message).to.be.a('string');",
+                      "});",
+                      "",
+                      "pm.test('[SCHEMA] Message includes registered keyword', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.message.toLowerCase()).to.include('registered');",
+                      "});",
+                      "",
+                      "pm.test('[DATA] Email stored correctly', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(pm.environment.get('unique_email')).to.be.a('string');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "f24d7ceb-16b2-4935-831a-d9fe04df8a7e"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "8c63fdd6-42e2-422c-abd8-41280f7a7ea7",
+              "name": "Register - Missing Email (Negative)",
+              "request": {
+                "url": {
+                  "path": [
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"password\": \"{{test_password}}\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "6031c9b4-5752-4806-af04-5cb3668f9cf9",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[VALIDATION] Missing email test executed', function () {",
+                      "    var response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('object');",
+                      "});",
+                      "",
+                      "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                      "    pm.response.to.have.status(409);",
+                      "});",
+                      "",
+                      "pm.test('[VALIDATION] API rejects missing required email field', function () {",
+                      "    var response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('object');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "612d9f88-91c5-4176-9edb-20f9ef20bae4"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "f456bfef-1925-4a32-acb7-59156975ee27",
+              "name": "Register - Missing Password (Negative)",
+              "request": {
+                "url": {
+                  "path": [
+                    "register"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\": \"test@example.com\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "64aeb694-1017-4db3-bd5b-74aeb0da3eff",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[VALIDATION] Missing password test executed', function () {",
+                      "    var response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('object');",
+                      "});",
+                      "",
+                      "pm.test('[HTTP] Status code must be 409 Conflict', function () {",
+                      "    pm.response.to.have.status(409);",
+                      "});",
+                      "",
+                      "pm.test('[VALIDATION] API rejects missing required password field', function () {",
+                      "    var response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('object');",
+                      "});"
+                    ],
+                    "_lastExecutionId": "4f682985-b896-4fd3-a377-4ff58cde96e2"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "2fc64c53-a56d-463c-876e-d32ba423a7fc",
+              "name": "Login Successfully",
+              "request": {
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\": \"{{unique_email}}\", \"password\": \"{{test_password}}\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "00943ddc-9ef9-42b6-82ea-f9e3d5d88a39",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[HTTP] Status code is 200', function () {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "",
+                      "pm.test('[SCHEMA] Response has JWT token field', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData).to.have.property('token');",
+                      "});",
+                      "",
+                      "pm.test('[SCHEMA] Token is non-empty string', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.expect(jsonData.token).to.be.a('string');",
+                      "    pm.expect(jsonData.token.length).to.be.greaterThan(0);",
+                      "});",
+                      "",
+                      "pm.test('[FORMAT] Token is valid JWT format', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    var jwtRegex = /^[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+\\.[A-Za-z0-9_-]+$/;",
+                      "    pm.expect(jwtRegex.test(jsonData.token)).to.be.true;",
+                      "});",
+                      "",
+                      "pm.test('[STATE] Token stored in environment', function () {",
+                      "    var jsonData = pm.response.json();",
+                      "    pm.environment.set('auth_token', jsonData.token);",
+                      "    pm.expect(pm.environment.get('auth_token')).to.equal(jsonData.token);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "b9c61876-ccbe-43f9-8a3c-cf8bb25f87f6"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "dcab9280-9a85-4cfe-88c1-4711cbeef30a",
+              "name": "Login - Invalid Credentials (Negative)",
+              "request": {
+                "url": {
+                  "path": [
+                    "login"
+                  ],
+                  "host": [
+                    "{{base_url}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"email\": \"nonexistent@example.com\", \"password\": \"WrongPassword\"}"
+                }
+              },
+              "response": [],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "id": "dbbad2cd-9a29-4c81-b019-5c7f09317c06",
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('[AUTH] Should reject invalid credentials with 401', function () {",
+                      "    pm.response.to.have.status(401);",
+                      "});"
+                    ],
+                    "_lastExecutionId": "d3384c7e-252b-4030-9734-761bbbf437a9"
+                  }
+                }
+              ]
+            }
+          ],
+          "event": []
+        },
+        "cursor": {
+          "ref": "9284223d-5395-4f5d-9f0b-af8b3fb8bef3",
+          "length": 17,
+          "cycles": 1,
+          "position": 2,
+          "iteration": 0,
+          "httpRequestId": "61f4fe32-b6fe-4ee9-8f86-a3faff1a6203",
+          "scriptId": "64aeb694-1017-4db3-bd5b-74aeb0da3eff",
+          "execution": "4f682985-b896-4fd3-a377-4ff58cde96e2"
+        }
+      }
+    ],
+    "error": null
+  }
+}

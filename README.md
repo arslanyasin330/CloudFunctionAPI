@@ -2,7 +2,7 @@
 
 Comprehensive test suite for the Firebase QA API Challenge using Postman and Newman with automated CI/CD integration.
 
-[![Run API Tests](https://github.com/emZubair/CloudFunctionsAPI/actions/workflows/run-tests.yml/badge.svg)](https://github.com/arslanyasin330/CloudFunctionAPI/actions)
+[[Run API Tests]](https://github.com/arslanyasin330/CloudFunctionAPI/actions)
 
 ## API Endpoints Tested
 
